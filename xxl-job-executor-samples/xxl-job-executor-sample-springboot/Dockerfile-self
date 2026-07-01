@@ -8,8 +8,8 @@ ENV PARAMS=""
 ENV TZ=PRC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# 安装mysql-client
-RUN yum install -y mysql && yum clean all
+# 安装 MySQL 客户端工具（包括 mysql、mysqldump、mysqlimport、mysqlshow 等）
+RUN yum install -y mysql mariadb && yum clean all
 
 # 将构建好的 jar 包复制到容器内
 ADD target/xxl-job-executor-sample-springboot-3.1.1.jar /data/jar/app.jar
