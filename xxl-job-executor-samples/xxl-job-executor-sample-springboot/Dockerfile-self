@@ -1,0 +1,24 @@
+FROM edwardg/javabase:21.0.5
+#FROM openjdk:17-jdk-slim
+
+MAINTAINER edward
+
+ENV PARAMS=""
+
+ENV TZ=PRC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# 安装 MySQL 客户端工具（包括 mysql、mysqldump、mysqlimport、mysqlshow 等）
+RUN yum install -y mysql mariadb && yum clean all
+
+# 将构建好的 jar 包复制到容器内
+ADD target/xxl-job-executor-sample-springboot-3.1.1.jar /data/jar/app.jar
+
+# 显式声明外部配置挂载点，方便后续 docker run -v 映射
+VOLUME ["/data/config"]
+VOLUME ["/home/scf/shell_to_mysql"]
+
+WORKDIR "/data"
+
+# 启动命令增加 --spring.config.location 指向外部配置目录
+ENTRYPOINT ["sh", "-c", "java -jar $JAVA_OPTS /data/jar/app.jar --spring.config.additional-location=optional:file:/data/config/application.properties $PARAMS"]
